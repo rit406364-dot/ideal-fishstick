@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIT</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#181113">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RIT">
+<style>
+  :root{
+    --bg:#181113; --surface:#241A1E; --surfaceAlt:#2E2024;
+    --rose:#E8607B; --roseSoft:#F2A6B6; --gold:#D4AF6A;
+    --text:#F6EDE9; --muted:#A88E92;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;}
+  #app{max-width:480px;margin:0 auto;padding-bottom:90px;min-height:100vh;}
+  header{display:flex;justify-content:space-between;align-items:center;padding:32px 24px 16px;}
+  .wordmark{font-size:28px;font-weight:700;color:var(--gold);position:relative;letter-spacing:0.5px;}
+  .status{font-size:12px;padding:4px 12px;border-radius:999px;background:var(--surfaceAlt);color:var(--muted);}
+  .status.active{background:rgba(232,96,123,0.15);color:var(--rose);}
+  .screen{padding:0 24px;display:flex;flex-direction:column;align-items:center;gap:24px;margin-top:24px;}
+  .label{color:var(--muted);font-size:14px;margin:0;text-align:center;}
+  .mono{font-family:'Courier New',monospace;}
+  .current-code{font-size:22px;letter-spacing:1px;margin:4px 0 0;}
+  .big-btn{width:176px;height:176px;border-radius:50%;border:none;position:relative;overflow:hidden;
+    background-image:url('couple-photo.jpg');background-size:cover;background-position:center 30%;
+    color:#fff;display:flex;align-items:flex-end;justify-content:center;
+    font-size:14px;font-weight:600;cursor:pointer;padding:0;}
+  .big-btn .overlay{position:absolute;left:0;right:0;bottom:0;padding:14px 0 12px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    background:linear-gradient(to top, rgba(24,17,19,0.85), rgba(24,17,19,0));}
+  .pulse{animation:pulse 2.2s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(232,96,123,0.45);}
+    70%{box-shadow:0 0 0 18px rgba(232,96,123,0);}
+    100%{box-shadow:0 0 0 0 rgba(232,96,123,0);}
+  }
+  .hint{font-size:12px;color:var(--muted);text-align:center;max-width:220px;}
+  .timer-ring{width:224px;height:224px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:var(--surface);border:2px solid var(--surfaceAlt);}
+  .timer-ring.active{border-color:var(--rose);}
+  .timer-text{font-size:34px;font-weight:700;}
+  .pill-btn{display:flex;align-items:center;gap:8px;padding:12px 24px;border-radius:999px;border:none;
+    font-weight:600;font-size:14px;cursor:pointer;}
+  .pill-btn.stop{background:var(--surfaceAlt);color:var(--rose);}
+  .pill-btn.start{background:var(--rose);color:#fff;}
+  .settings-wrap{padding:24px;display:flex;flex-direction:column;gap:20px;}
+  .section-title{color:var(--gold);font-size:14px;font-weight:600;margin:0 0 8px;}
+  .row{display:flex;gap:8px;}
+  input[type=text]{flex:1;padding:14px 16px;border-radius:14px;border:1px solid var(--surfaceAlt);
+    background:var(--surface);color:var(--text);font-size:15px;outline:none;}
+  .add-btn{padding:0 18px;border-radius:14px;border:none;background:var(--gold);color:var(--bg);font-weight:700;cursor:pointer;}
+  .plus-btn{width:48px;height:48px;border-radius:50%;border:none;background:var(--rose);color:#fff;
+    font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .plus-row{display:flex;align-items:center;gap:12px;margin-top:14px;}
+  .plus-hint{font-size:12px;color:var(--muted);}
+  .banner{margin-top:12px;padding:12px 16px;border-radius:14px;font-size:13px;display:flex;gap:8px;align-items:flex-start;}
+  .banner.warn{background:rgba(232,96,123,0.12);color:var(--rose);}
+  .banner.ok{background:rgba(212,175,106,0.12);color:var(--gold);}
+  .hist-title{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:600;margin-bottom:10px;}
+  .num-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:14px;
+    background:var(--surface);margin-bottom:8px;border:1px solid transparent;}
+  .num-item.current{background:rgba(212,175,106,0.1);border-color:var(--gold);}
+  .num-val{font-size:14px;}
+  .num-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+  .del-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;}
+  nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--surfaceAlt);
+    display:flex;justify-content:space-around;padding:14px 0;max-width:480px;margin:0 auto;}
+  nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;
+    color:var(--muted);font-size:11px;cursor:pointer;}
+  nav button.active{color:var(--rose);}
+  .icon{font-size:20px;line-height:1;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+let state = {
+  tab: 'home',
+  session: { active: false, startTime: null },
+  numbers: [],
+  warning: null,
+  confirm: null,
+};
+let tickInterval = null;
+
+// App que se abre al pulsar "Add". Cambiar aquí para usar otra app.
+const LINKED_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.etecsa.cubacel.tr.tm;S.browser_fallback_url=https%3A%2F%2Fwww.etecsa.cu%2Fes%2Faplicaciones%2Ftransfermovil;end;';
+const LINKED_APP_NAME = 'Transfermóvil';
+
+function load() {
+  try { state.session = JSON.parse(localStorage.getItem('rit_session')) || { active: false, startTime: null }; } catch(e){}
+  try { state.numbers = JSON.parse(localStorage.getItem('rit_numbers')) || []; } catch(e){}
+}
+function saveSession(){ localStorage.setItem('rit_session', JSON.stringify(state.session)); }
+function saveNumbers(){ localStorage.setItem('rit_numbers', JSON.stringify(state.numbers)); }
+
+function formatElapsed(ms){
+  const total = Math.max(0, Math.floor(ms/1000));
+  const h = String(Math.floor(total/3600)).padStart(2,'0');
+  const m = String(Math.floor((total%3600)/60)).padStart(2,'0');
+  const s = String(total%60).padStart(2,'0');
+  return h+':'+m+':'+s;
+}
+
+function startSession(){
+  state.session = { active: true, startTime: Date.now() };
+  saveSession();
+  state.tab = 'tiempo';
+  startTick();
+  render();
+}
+function stopSession(){
+  state.session = { active: false, startTime: null };
+  saveSession();
+  stopTick();
+  render();
+}
+function startTick(){
+  stopTick();
+  tickInterval = setInterval(() => { if(state.tab==='tiempo' || state.tab==='home') render(); }, 1000);
+}
+function stopTick(){ if(tickInterval) clearInterval(tickInterval); tickInterval = null; }
+
+function setTab(t){ state.tab = t; render(); }
+
+function openLinkedApp(){
+  window.location.href = LINKED_APP_URL;
+}
+
+function addNumber(){
+  const input = document.getElementById('numInput');
+  const val = input.value.trim();
+  if(!val) return;
+  const exists = state.numbers.find(n => n.value.toLowerCase() === val.toLowerCase());
+  if(exists){
+    state.warning = 'Ya se usó este código el ' + new Date(exists.savedAt).toLocaleDateString('es-ES') + '.';
+    state.confirm = null;
+    render();
+    setTimeout(() => { state.warning = null; render(); }, 5000);
+    return;
+  }
+  state.numbers.forEach(n => n.current = false);
+  state.numbers.unshift({ id: Date.now().toString(), value: val, savedAt: Date.now(), current: true });
+  saveNumbers();
+  state.warning = null;
+  state.confirm = 'Código guardado como actual. Abriendo ' + LINKED_APP_NAME + '…';
+  render();
+  input.value = '';
+  setTimeout(() => { state.confirm = null; render(); }, 3000);
+  window.location.href = LINKED_APP_URL;
+}
+function deleteNumber(id){
+  state.numbers = state.numbers.filter(n => n.id !== id);
+  saveNumbers();
+  render();
+}
+
+function render(){
+  const app = document.getElementById('app');
+  const current = state.numbers.find(n => n.current);
+  const elapsed = state.session.active ? Date.now() - state.session.startTime : 0;
+
+  let body = '';
+  if(state.tab === 'home'){
+    body = `
+      <div class="screen">
+        <div style="text-align:center;">
+          <p class="label">Código actual</p>
+          <p class="current-code mono">${current ? current.value : '— sin asignar —'}</p>
+        </div>
+        <button class="big-btn ${state.session.active ? 'pulse' : ''}"
+          onclick="${state.session.active ? "setTab('tiempo')" : 'startSession()'}">
+          <span class="overlay">
+            <span class="icon">${state.session.active ? '⏱' : '▶'}</span>
+            <span>${state.session.active ? 'Ver tiempo' : 'Iniciar'}</span>
+          </span>
+        </button>
+        <p class="hint">${state.session.active
+          ? 'La aplicación está abierta y contando el tiempo real de conexión.'
+          : 'Abre la aplicación y comienza a contar el tiempo de conexión.'}</p>
+      </div>`;
+  } else if(state.tab === 'tiempo'){
+    body = `
+      <div class="screen">
+        <p class="label">Tiempo real de conexión</p>
+        <div class="timer-ring ${state.session.active ? 'active pulse' : ''}">
+          <span class="timer-text mono">${formatElapsed(elapsed)}</span>
+        </div>
+        ${state.session.active
+          ? `<button class="pill-btn stop" onclick="stopSession()"><span class="icon">⏹</span> Detener</button>`
+          : `<button class="pill-btn start" onclick="startSession()"><span class="icon">▶</span> Iniciar</button>`}
+      </div>`;
+  } else if(state.tab === 'ajustes'){
+    const items = state.numbers.map(n => `
+      <div class="num-item ${n.current ? 'current' : ''}">
+        <div>
+          <div class="num-val mono">${n.value}</div>
+          <div class="num-meta">${n.current ? 'Actual' : 'Antiguo'} · ${new Date(n.savedAt).toLocaleDateString('es-ES')}</div>
+        </div>
+        <button class="del-btn" onclick="deleteNumber('${n.id}')">🗑</button>
+      </div>`).join('');
+
+    body = `
+      <div class="settings-wrap">
+        <div>
+          <p class="section-title">Cambio de # / los códigos</p>
+          <div class="row">
+            <input type="text" id="numInput" placeholder="Nuevo número o código" onkeydown="if(event.key==='Enter')addNumber()">
+            <button class="add-btn" onclick="addNumber()">Add</button>
+          </div>
+          <div class="plus-row">
+            <button class="plus-btn" onclick="openLinkedApp()" title="Abrir ${LINKED_APP_NAME}">+</button>
+            <span class="plus-hint">Abre ${LINKED_APP_NAME} directamente</span>
+          </div>
+          ${state.warning ? `<div class="banner warn">⚠ <span>${state.warning}</span></div>` : ''}
+          ${state.confirm ? `<div class="banner ok">✓ <span>${state.confirm}</span></div>` : ''}
+        </div>
+        <div>
+          <div class="hist-title">🕒 Registro — antiguos vs. actual</div>
+          ${state.numbers.length === 0 ? '<p class="label">Aún no hay números guardados.</p>' : items}
+        </div>
+      </div>`;
+  }
+
+  app.innerHTML = `
+    <header>
+      <div class="wordmark">RIT</div>
+      <span class="status ${state.session.active ? 'active' : ''}">${state.session.active ? 'Conectado' : 'Inactivo'}</span>
+    </header>
+    ${body}
+    <nav>
+      <button class="${state.tab==='home'?'active':''}" onclick="setTab('home')"><span class="icon">▶</span>Iniciar</button>
+      <button class="${state.tab==='tiempo'?'active':''}" onclick="setTab('tiempo')"><span class="icon">⏱</span>Tiempo</button>
+      <button class="${state.tab==='ajustes'?'active':''}" onclick="setTab('ajustes')"><span class="icon">⚙</span>Ajustes</button>
+    </nav>
+  `;
+  if(state.tab === 'ajustes'){
+    const inp = document.getElementById('numInput');
+    if(inp) inp.focus({preventScroll:true});
+  }
+}
+
+load();
+if(state.session.active) startTick();
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
