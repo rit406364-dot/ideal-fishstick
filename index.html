@@ -16,7 +16,7 @@
     --bg:#181113; --surface:#241A1E; --surfaceAlt:#2E2024;
     --rose:#E8607B; --roseSoft:#F2A6B6; --gold:#D4AF6A;
     --text:#F6EDE9; --muted:#A88E92;
-    --tm-bg:#e0e0e0; --ez-bg:#007ba4; --clasica-bg:#16427b;
+    --tm-bg:#005138; --ez-bg:#007ba4; --clasica-bg:#16427b;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);
@@ -59,17 +59,22 @@
     background:var(--surface);color:var(--text);font-size:15px;outline:none;}
   .add-btn{padding:0 18px;border-radius:14px;border:none;background:var(--gold);color:var(--bg);font-weight:700;cursor:pointer;}
   
-  /* Contenedor elegante para los 3 nuevos iconos */
+  /* Contenedor de iconos */
   .apps-container{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
   .app-shortcut-btn{width:58px;height:58px;border-radius:16px;border:2px solid var(--surfaceAlt);cursor:pointer;
-    display:flex;align-items:center;justify-content:center;overflow:hidden;transition:transform 0.1s;padding:0;}
+    display:flex;align-items:center;justify-content:center;overflow:hidden;transition:transform 0.1s;padding:0;position:relative;}
   .app-shortcut-btn:active{transform:scale(0.92);}
   .app-shortcut-btn.tm{background:var(--tm-bg);}
   .app-shortcut-btn.ez{background:var(--ez-bg);}
   .app-shortcut-btn.cc{background:var(--clasica-bg);}
-  .app-shortcut-btn img{width:100%;height:100%;object-fit:cover;}
-  .app-shortcut-btn span{font-weight:800;font-size:14px;color:#fff;text-align:center;line-height:1.1;}
+  .app-shortcut-btn img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:2;}
   
+  /* Flechas personalizadas para Transfermóvil */
+  .tm-arrows{display:flex;gap:4px;align-items:center;justify-content:center;font-weight:900;font-size:24px;z-index:1;user-select:none;}
+  .arrow-white{color:#ffffff;display:inline-block;transform:rotate(180deg);line-height:1;}
+  .arrow-green{color:#00e676;display:inline-block;line-height:1;}
+  
+  .app-shortcut-btn span.backup-txt{font-weight:800;font-size:14px;color:#fff;text-align:center;line-height:1.1;z-index:1;}
   .plus-hint{font-size:12px;color:var(--muted);margin-top:6px;}
   .banner{margin-top:12px;padding:12px 16px;border-radius:14px;font-size:13px;display:flex;gap:8px;align-items:flex-start;}
   .banner.warn{background:rgba(232,96,123,0.12);color:var(--rose);}
@@ -102,7 +107,6 @@ let state = {
 };
 let tickInterval = null;
 
-// Enlaces de ejecución (Intents Android y URLs)
 const LINKED_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.etecsa.cubacel.tr.tm;S.browser_fallback_url=https%3A%2F%2Fwww.etecsa.cu%2Fes%2Faplicaciones%2Ftransfermovil;end;';
 const ENZONA_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.xetid.enzona;end;';
 const CLASICA_WEB_URL = 'https://www.aisremesas.com/';
@@ -231,19 +235,22 @@ function render(){
             <button class="add-btn" onclick="addNumber()">Add</button>
           </div>
           
-          <!-- Los 3 nuevos botones de accesos rápidos con respaldo de texto -->
           <div class="apps-container">
+            <!-- Icono estilizado de Transfermóvil con flechas blanca y verde -->
             <button class="app-shortcut-btn tm" onclick="openLinkedApp()" title="Abrir Transfermóvil">
-              <img src="transfermovil.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-              <span style="display:none; color:#009640;">TM</span>
+              <img src="transfermovil.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="tm-arrows" style="display:none;">
+                <span class="arrow-white">↑</span>
+                <span class="arrow-green">↑</span>
+              </div>
             </button>
             <button class="app-shortcut-btn ez" onclick="openEnzona()" title="Abrir Enzona">
               <img src="enzona.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-              <span style="display:none; color:#ffffff;">EZ</span>
+              <span class="backup-txt" style="display:none;">EZ</span>
             </button>
             <button class="app-shortcut-btn cc" onclick="openClasica()" title="Tarjeta Clásica">
               <img src="clasica.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-              <span style="display:none; color:#ffffff;">CARD</span>
+              <span class="backup-txt" style="display:none;">CARD</span>
             </button>
           </div>
           <div class="plus-hint">Accesos rápidos para tus operaciones cotidianas.</div>
