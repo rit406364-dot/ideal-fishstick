@@ -107,8 +107,9 @@ let state = {
 };
 let tickInterval = null;
 
-const LINKED_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.etecsa.cubacel.tr.tm;S.browser_fallback_url=https%3A%2F%2Fwww.etecsa.cu%2Fes%2Faplicaciones%2Ftransfermovil;end;';
-const ENZONA_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.xetid.enzona;end;';
+// Enlaces directos forzados para abrir las APKs directamente instaladas sin pasar por Play Store
+const LINKED_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.etecsa.cubacel.tr.tm;end';
+const ENZONA_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.xetid.enzona;end';
 const CLASICA_WEB_URL = 'https://www.aisremesas.com/';
 
 const LINKED_APP_NAME = 'Transfermóvil';
@@ -236,7 +237,6 @@ function render(){
           </div>
           
           <div class="apps-container">
-            <!-- Icono estilizado de Transfermóvil con flechas blanca y verde -->
             <button class="app-shortcut-btn tm" onclick="openLinkedApp()" title="Abrir Transfermóvil">
               <img src="transfermovil.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
               <div class="tm-arrows" style="display:none;">
