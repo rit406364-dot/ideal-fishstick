@@ -1,15 +1,17 @@
 {
-  "name": "RIT",
+  "name": "RIT Connection App",
   "short_name": "RIT",
-  "description": "Registro de números/códigos y tiempo de conexión",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "Aplicación de control de tiempo de conexión y accesos rápidos a operaciones cotidianas.",
+  "start_url": "index.html",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#181113",
-  "theme_color": "#181113",
+  "theme-color": "#181113",
+  "orientation": "portrait",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
   ]
 }
