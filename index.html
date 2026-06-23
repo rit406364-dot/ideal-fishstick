@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RIT</title>
-<link rel="manifest" href="manifest.json">
+<link class="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#181113">
@@ -16,6 +16,7 @@
     --bg:#181113; --surface:#241A1E; --surfaceAlt:#2E2024;
     --rose:#E8607B; --roseSoft:#F2A6B6; --gold:#D4AF6A;
     --text:#F6EDE9; --muted:#A88E92;
+    --tm-bg:#e0e0e0; --ez-bg:#007ba4; --clasica-bg:#16427b;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);
@@ -57,10 +58,19 @@
   input[type=text]{flex:1;padding:14px 16px;border-radius:14px;border:1px solid var(--surfaceAlt);
     background:var(--surface);color:var(--text);font-size:15px;outline:none;}
   .add-btn{padding:0 18px;border-radius:14px;border:none;background:var(--gold);color:var(--bg);font-weight:700;cursor:pointer;}
-  .plus-btn{width:48px;height:48px;border-radius:50%;border:none;background:var(--rose);color:#fff;
-    font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .plus-row{display:flex;align-items:center;gap:12px;margin-top:14px;}
-  .plus-hint{font-size:12px;color:var(--muted);}
+  
+  /* Contenedor elegante para los 3 nuevos iconos */
+  .apps-container{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
+  .app-shortcut-btn{width:58px;height:58px;border-radius:16px;border:2px solid var(--surfaceAlt);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;transition:transform 0.1s;padding:0;}
+  .app-shortcut-btn:active{transform:scale(0.92);}
+  .app-shortcut-btn.tm{background:var(--tm-bg);}
+  .app-shortcut-btn.ez{background:var(--ez-bg);}
+  .app-shortcut-btn.cc{background:var(--clasica-bg);}
+  .app-shortcut-btn img{width:100%;height:100%;object-fit:cover;}
+  .app-shortcut-btn span{font-weight:800;font-size:14px;color:#fff;text-align:center;line-height:1.1;}
+  
+  .plus-hint{font-size:12px;color:var(--muted);margin-top:6px;}
   .banner{margin-top:12px;padding:12px 16px;border-radius:14px;font-size:13px;display:flex;gap:8px;align-items:flex-start;}
   .banner.warn{background:rgba(232,96,123,0.12);color:var(--rose);}
   .banner.ok{background:rgba(212,175,106,0.12);color:var(--gold);}
@@ -92,8 +102,11 @@ let state = {
 };
 let tickInterval = null;
 
-// App que se abre al pulsar "Add". Cambiar aquí para usar otra app.
+// Enlaces de ejecución (Intents Android y URLs)
 const LINKED_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.etecsa.cubacel.tr.tm;S.browser_fallback_url=https%3A%2F%2Fwww.etecsa.cu%2Fes%2Faplicaciones%2Ftransfermovil;end;';
+const ENZONA_APP_URL = 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=cu.xetid.enzona;end;';
+const CLASICA_WEB_URL = 'https://www.aisremesas.com/';
+
 const LINKED_APP_NAME = 'Transfermóvil';
 
 function load() {
@@ -132,9 +145,9 @@ function stopTick(){ if(tickInterval) clearInterval(tickInterval); tickInterval 
 
 function setTab(t){ state.tab = t; render(); }
 
-function openLinkedApp(){
-  window.location.href = LINKED_APP_URL;
-}
+function openLinkedApp(){ window.location.href = LINKED_APP_URL; }
+function openEnzona(){ window.location.href = ENZONA_APP_URL; }
+function openClasica(){ window.location.href = CLASICA_WEB_URL; }
 
 function addNumber(){
   const input = document.getElementById('numInput');
@@ -185,7 +198,7 @@ function render(){
           </span>
         </button>
         <p class="hint">${state.session.active
-          ? 'La aplicación está abierta y contando el tiempo real de conexión.'
+          ? 'La aplicación está abierta y counting el tiempo real de conexión.'
           : 'Abre la aplicación y comienza a contar el tiempo de conexión.'}</p>
       </div>`;
   } else if(state.tab === 'tiempo'){
@@ -217,10 +230,24 @@ function render(){
             <input type="text" id="numInput" placeholder="Nuevo número o código" onkeydown="if(event.key==='Enter')addNumber()">
             <button class="add-btn" onclick="addNumber()">Add</button>
           </div>
-          <div class="plus-row">
-            <button class="plus-btn" onclick="openLinkedApp()" title="Abrir ${LINKED_APP_NAME}">+</button>
-            <span class="plus-hint">Abre ${LINKED_APP_NAME} directamente</span>
+          
+          <!-- Los 3 nuevos botones de accesos rápidos con respaldo de texto -->
+          <div class="apps-container">
+            <button class="app-shortcut-btn tm" onclick="openLinkedApp()" title="Abrir Transfermóvil">
+              <img src="transfermovil.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span style="display:none; color:#009640;">TM</span>
+            </button>
+            <button class="app-shortcut-btn ez" onclick="openEnzona()" title="Abrir Enzona">
+              <img src="enzona.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span style="display:none; color:#ffffff;">EZ</span>
+            </button>
+            <button class="app-shortcut-btn cc" onclick="openClasica()" title="Tarjeta Clásica">
+              <img src="clasica.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <span style="display:none; color:#ffffff;">CARD</span>
+            </button>
           </div>
+          <div class="plus-hint">Accesos rápidos para tus operaciones cotidianas.</div>
+
           ${state.warning ? `<div class="banner warn">⚠ <span>${state.warning}</span></div>` : ''}
           ${state.confirm ? `<div class="banner ok">✓ <span>${state.confirm}</span></div>` : ''}
         </div>
